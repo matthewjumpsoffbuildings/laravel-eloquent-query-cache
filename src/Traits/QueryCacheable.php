@@ -36,6 +36,16 @@ trait QueryCacheable
     }
 
     /**
+     * Get the Query Builder class to be used for newBaseQueryBuilder.
+     * When using Override this to specify a custom Builder class that 
+     * uses the QueryCacheModule trait
+     */
+    public static function getBuilderClass()
+    {
+        return Builder::class;
+    }
+
+    /**
      * Get the observer class name that will
      * observe the changes and will invalidate the cache
      * upon database change.
@@ -82,7 +92,9 @@ trait QueryCacheable
         /** @var \Illuminate\Database\Eloquent\Model $this */
         $connection = $this->getConnection();
 
-        $builder = new Builder(
+        $builderClass = static::getBuilderClass() ?? Builder::class;
+
+        $builder = new $builderClass (
             $connection,
             $connection->getQueryGrammar(),
             $connection->getPostProcessor()
